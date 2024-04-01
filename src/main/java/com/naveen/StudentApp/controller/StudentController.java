@@ -20,14 +20,18 @@ public class StudentController {
 
     private final StudentService studentService;
 
-    // Get list of students segrated by class like all 10th clas in 1 list 9th class in other list
-    // if we ask seperate class we need to get seperate class
 
     @GetMapping()
-    public ResponseEntity<?> getAllStudents(@RequestHeader(value = "orderBy", defaultValue =  "ascending", required = false) String orderBy,
+    public ResponseEntity<?> getAllStudents(){
+
+        return studentService.getAllStudents();
+    }
+
+    @GetMapping("/sorted")
+    public ResponseEntity<?> getAllStudentsSorted(@RequestHeader(value = "orderBy", defaultValue =  "ascending", required = false) String orderBy,
                                             @RequestHeader(value =  "sortBy", defaultValue = "studentId", required = false) String sortBy){
 
-        return studentService.getAllStudents(orderBy, sortBy);
+        return studentService.getAllStudentsSorted(orderBy, sortBy);
     }
 
     @GetMapping("/{id}")

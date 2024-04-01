@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @Builder
 public class StudentRequest {
-//    private int studentId;
+    private int studentId;
     private String name;
     private String department;
     private String marks;
