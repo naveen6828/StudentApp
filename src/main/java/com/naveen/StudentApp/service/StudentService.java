@@ -19,7 +19,11 @@ public class StudentService {
     private final StudentRepository studentRepository;
 
     //    Get all Students with orderBy and sortBy
-    public ResponseEntity<?> getAllStudents(String orderBy, String sortBy){
+    public ResponseEntity<?> getAllStudents() {
+        return new ResponseEntity<>(studentRepository.findAll(), HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getAllStudentsSorted(String orderBy, String sortBy){
 
         List<Student> studentList = studentRepository.findAll();
         List<String> fields = Arrays.stream(Student.class.getDeclaredFields())
