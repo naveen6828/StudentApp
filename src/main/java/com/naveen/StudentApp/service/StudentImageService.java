@@ -1,6 +1,5 @@
 package com.naveen.StudentApp.service;
 
-import com.fasterxml.jackson.databind.util.NativeImageUtil;
 import com.naveen.StudentApp.entity.StudentImage;
 import com.naveen.StudentApp.repository.StudentImageRepository;
 import com.naveen.StudentApp.utils.ImageUtils;
