@@ -2,6 +2,9 @@ package com.naveen.StudentApp.controller;
 
 import com.naveen.StudentApp.repository.TeacherRepository;
 import com.naveen.StudentApp.service.TeacherService;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,11 @@ public class TeacherController {
     @GetMapping
     public ResponseEntity<?> getAllTeachers(){
         return teacherService.getAllTeachers();
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<?> exportTeachersAsCsv(HttpServletResponse response) throws Exception {
+        return teacherService.exportTeachersAsCsv(response);
     }
 
 }
