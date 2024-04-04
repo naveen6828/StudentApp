@@ -3,19 +3,17 @@ package com.naveen.StudentApp.service;
 import com.naveen.StudentApp.dto.TeacherCSVRepresentation;
 import com.naveen.StudentApp.entity.Teacher;
 import com.naveen.StudentApp.repository.TeacherRepository;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
-import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.*;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +31,28 @@ public class TeacherService {
 
     public ResponseEntity<?> getAllTeachers() {
         return new ResponseEntity<>(teacherRepository.findAll(),HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> exportTeachersAsCsv(HttpServletResponse response) throws Exception {
+        String filename = "TeacherData.csv";
+        response.setContentType("text/csv");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename+ "\"");
+
+//        StatefulBeanToCsv<Teacher> beanToCsv = new StatefulBeanToCsvBuilder<Teacher>(response.getWriter())
+//                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER)
+//                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+//                .withOrderedResults(false)
+//                .build();
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(byteArrayOutputStream);
+        StatefulBeanToCsv<Teacher> beanToCsv = new StatefulBeanToCsvBuilder<Teacher>(writer)
+                .withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR).withOrderedResults(false)
+                .build();
+        //write all employees data to csv file
+        beanToCsv.write(teacherRepository.findAll());
+        writer.flush();
+        return new ResponseEntity<>("CSV file will be downloaded if you execute the url in any browser", HttpStatus.OK);
     }
 
     private Set<Teacher> parseCSV(MultipartFile file) throws IOException {
