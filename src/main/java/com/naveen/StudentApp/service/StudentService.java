@@ -1,12 +1,17 @@
 package com.naveen.StudentApp.service;
 
+import com.naveen.StudentApp.dto.AddressResponse;
 import com.naveen.StudentApp.dto.StudentRequest;
 import com.naveen.StudentApp.dto.StudentResponse;
+import com.naveen.StudentApp.entity.Address;
 import com.naveen.StudentApp.entity.Student;
+import com.naveen.StudentApp.producer.StudentProducer;
 import com.naveen.StudentApp.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,11 +22,24 @@ import java.util.stream.Collectors;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+//    private final JmsTemplate jmsTemplate;
+    private final StudentProducer studentProducer;
 
     //    Get all Students with orderBy and sortBy
     public ResponseEntity<?> getAllStudents() {
         return new ResponseEntity<>(studentRepository.findAll(), HttpStatus.OK);
     }
+
+    public void getAllStudentsToQueue() {
+        List<Student> studentList = studentRepository.findAll();
+        List<StudentResponse> studentResponses = studentList.stream()
+                        .map(student -> toDTO(student))
+                        .collect(Collectors.toList());
+
+//        jmsTemplate.convertAndSend("studentQueue",studentResponses);
+        studentProducer.getAllStudentsQueue(studentResponses);
+    }
+
 
     public ResponseEntity<?> getAllStudentsSorted(String orderBy, String sortBy){
 
@@ -123,10 +141,23 @@ public class StudentService {
                 .name(student.getName())
                 .className(student.getClassName())
                 .department(student.getDepartment())
-                .address(student.getAddress())
+                .address(toDTOAddress(student.getAddress()))
                 .build();
 
         return studentResponse;
+    }
+
+    private AddressResponse toDTOAddress(Address address){
+        if(address==null)
+            return null;
+        AddressResponse addressResponse = AddressResponse.builder()
+                .addressId(address.getAddressId())
+                .line1(address.getLine1())
+                .city(address.getCity())
+                .state(address.getState())
+                .zipCode(address.getZipCode())
+                .build();
+        return addressResponse;
     }
 
 

@@ -25,6 +25,11 @@ public class StudentController {
         return studentService.getAllStudents();
     }
 
+    @GetMapping("/queue")
+    public void getAllStudentsToQueue(){
+        studentService.getAllStudentsToQueue();
+    }
+
     @GetMapping("/sorted")
     public ResponseEntity<?> getAllStudentsSorted(@RequestHeader(value = "orderBy", defaultValue =  "ascending", required = false) String orderBy,
                                             @RequestHeader(value =  "sortBy", defaultValue = "studentId", required = false) String sortBy){
